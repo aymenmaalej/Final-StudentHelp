@@ -1,0 +1,60 @@
+{% extends 'base.html' %} {% block content %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>View Internship Offers</title>
+        <style>
+            h1 {
+                text-align: center;
+                color: #333;
+                margin-bottom: 30px;
+            }
+
+            .internship-offers {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .internship-offers li {
+                background-color: #fff;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                margin-bottom: 20px;
+                transition: transform 0.3s;
+            }
+
+            .internship-offers li:hover {
+                transform: translateY(-5px);
+            }
+
+            .internship-offers li h3 {
+                color: #007bff;
+                margin-bottom: 10px;
+            }
+
+            .internship-offers li p {
+                color: #555;
+                margin-bottom: 5px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1>Internship Offers</h1>
+        <ul class="internship-offers">
+            {% for stage in stages %}
+            <li>
+                <h3>{{ stage.typeStg }} at {{ stage.societe }}</h3>
+                <p>{{ stage.description }}</p>
+                <p>Contact Info: {{ stage.contactInfo }}</p>
+                <p>Specialite: {{ stage.specialite }}</p>
+            </li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>
+{% endblock %}

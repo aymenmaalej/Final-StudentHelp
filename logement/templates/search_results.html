@@ -1,0 +1,33 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container">
+    <h1>Search Results</h1>
+    {% if accommodations %}
+    <div class="row">
+        {% for accommodation in accommodations %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                {% if accommodation.image %}
+                <img src="{{ accommodation.image.url }}" class="card-img-top" alt="{{ accommodation.title }}" />
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ accommodation.title }}</h5>
+                    <p class="card-text">{{ accommodation.description }}</p>
+                    <p class="card-text">Address: {{ accommodation.address }}</p>
+                    <p class="card-text">Price: ${{ accommodation.price }}</p>
+                    <p class="card-text">Available from: {{ accommodation.available_from }}</p>
+                    <p class="card-text">Available to: {{ accommodation.available_to }}</p>
+                    <p class="card-text">Bedrooms: {{ accommodation.bedrooms }}</p>
+                    <p class="card-text">Bathrooms: {{ accommodation.bathrooms }}</p>
+                    <p class="card-text">Furnished: {% if accommodation.is_furnished %} Yes {% else %} No {% endif %}</p>
+                    <a href="{% url 'book_accommodation' accommodation.id %}" class="btn btn-primary">Book</a>
+                    <a href="{% url 'submit_review' accommodation.id %}" class="btn btn-primary">Submit Review</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No accommodations found.</p>
+    {% endif %}
+</div>
+{% endblock %}

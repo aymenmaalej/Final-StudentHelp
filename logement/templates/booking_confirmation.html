@@ -1,0 +1,15 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container d-flex justify-content-center align-items-center vh-50">
+    <div class="card bg-light shadow-lg mt-5">
+        <div class="card-body">
+            <h1 class="card-title mb-4 text-primary">Booking Confirmation</h1>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Accommodation: {{ booking.accommodation.title }}</li>
+                <li class="list-group-item">Check-in Date: {{ booking.check_in_date }}</li>
+                <li class="list-group-item">Check-out Date: {{ booking.check_out_date }}</li>
+                <li class="list-group-item">Confirmed: {% if booking.is_confirmed %}Yes{% else %}No{% endif %}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

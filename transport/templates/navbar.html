@@ -1,0 +1,172 @@
+{% load static %}
+<style>
+    .student-help-navbar .navCont .navIcon {
+        display: inline-flex;
+    }
+    .student-help-navbar .navCont {
+        margin-right: 200px;
+    }
+    .student-help-navbar .navIcon {
+        margin-right: 20px;
+    }
+    .student-help-navbar .search-results {
+        position: absolute;
+        top: 100%;
+        right: 25px;
+        width: 100%;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        z-index: 1000;
+        max-height: 150px; /* Reduced max-height for smaller dropdown */
+        overflow-y: auto;
+        display: none; /* Initially hide the search results dropdown */
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 0;
+        margin-top: 2px; /* Small gap between the search input and the dropdown */
+    }
+    .student-help-navbar .search-results ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .student-help-navbar .search-results li {
+        padding: 5px 10px; /* Smaller padding for smaller dropdown */
+        border-bottom: 5px solid #ccc;
+        cursor: pointer;
+        background-color: #fff;
+    }
+    .student-help-navbar .search-result-item {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .student-help-navbar .search-result-item:hover {
+        background-color: #f0f0f0;
+    }
+    .student-help-navbar .search-result-image {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+    .student-help-navbar .search-result-name {
+        font-size: 14px;
+        color: #333;
+    }
+    .student-help-navbar .search-results li:hover {
+        background-color: #f0f0f0;
+    }
+    /* Search input style */
+    .student-help-navbar .search-input {
+        margin-right: 10px; /* Adjust margin for spacing */
+    }
+    .student-help-navbar .search-input .form-control {
+        width: 200px; /* Set width of the search input */
+    }
+    .student-help-navbar .nav-item {
+        margin-right: 10px; /* Adjust margin between navbar items */
+    }
+
+    .student-help-navbar .search-input {
+        margin-right: 10px; /* Adjust margin between search input and navbar items */
+    }
+</style>
+
+<!-- Navbar HTML content -->
+<nav class="student-help-navbar navbar navbar-expand-lg navbar-light fixed-top" style="background-color: #ccc">
+    <a class="navbar-brand" href="{% url '' %}">
+        <img src="{% static 'images/logo.jpg' %}" alt="StudentHelp" width="30" class="rounded-circle" />
+    </a>
+    <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+    >
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+            <div class="navCont">
+                <li class="nav-item active navIcon">
+                    <a class="nav-link" href="{% url '' %}"><img src="{% static 'images/home.png' %}" width="20" /></a>
+                </li>
+                <li class="nav-item navIcon">
+                    <a class="nav-link" href="{% url 'logement' %}"><img src="{% static 'images/sold-house.png' %}" width="20" /></a>
+                </li>
+                <li class="nav-item navIcon">
+                    <a class="nav-link" href="{% url 'transport_selection' %}"
+                        ><img src="{% static 'images/car-side.png' %}" width="20"
+                    /></a>
+                </li>
+                <li class="nav-item navIcon">
+                    <a class="nav-link" href="{% url 'marketplace/main' %}"
+                        ><img src="{% static 'images/marketplace-store.png' %}" width="20"
+                    /></a>
+                </li>
+                <li class="nav-item navIcon">
+                    <a class="nav-link" href="{% url 'internship' %}"><img src="{% static 'images/briefcase.png' %}" width="20" /></a>
+                </li>
+            </div>
+            {% if user.is_authenticated %}
+            <!-- Display username and logout button if user is logged in -->
+            <li class="nav-item">
+                <span class="nav-link">{{ user.name }}</span>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+            </li>
+            {% else %}
+            <!-- Display login button if user is not logged in -->
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+            </li>
+            {% endif %}
+            <li class="nav-item">
+                <div class="dropdowns-wrapper">
+                    <div class="dropdown-container">
+                        <div class="notifications dropdown dd-trigger" onclick="showNotifications(event)">
+                            <div class="notification-icon">
+                                <img src="{% static 'images/bell.png' %}" width="20" alt="Notification Bell" />
+                                <span class="count animated" id="notifications-count">0</span>
+                            </div>
+                        </div>
+                        <div class="dropdown-menu animated" id="notification-dropdown">
+                            <div class="dropdown-header">
+                                <span class="triangle"></span>
+                                <span class="heading">Notifications</span>
+                                <span class="count" id="dd-notifications-count">0</span>
+                            </div>
+                            <div class="dropdown-body" id="notification-body">
+                                <!-- Notifications will be rendered here -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Other dropdown containers (if any) -->
+                </div>
+            </li>
+        </ul>
+        <!-- Search Input -->
+        <div class="search-input">
+            <input
+                class="form-control mr-sm-2"
+                type="search"
+                placeholder="Search"
+                aria-label="Search"
+                name="q"
+                id="searchInput"
+                autocomplete="off"
+            />
+        </div>
+        <!-- Search Results -->
+        <div class="search-results">
+            <ul id="searchResults"></ul>
+        </div>
+    </div>
+</nav>

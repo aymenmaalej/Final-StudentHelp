@@ -1,0 +1,45 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container">
+    <h1 class="my-4">Accommodation Reviews</h1>
+    {% if accommodations %}
+    <div class="row">
+        {% for accommodation in accommodations %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="card-title text-primary">{{ accommodation.title }}</h2>
+                    <p class="card-text text-muted">Description: {{ accommodation.description }}</p>
+                    <p class="card-text text-muted">Address: {{ accommodation.address }}</p>
+                    <p class="card-text text-muted">Price: {{ accommodation.price }}</p>
+                    <p class="card-text text-muted">Bedrooms: {{ accommodation.bedrooms }}</p>
+                    <p class="card-text text-muted">Bathrooms: {{ accommodation.bathrooms }}</p>
+                    <p class="card-text text-muted">Furnished: {% if accommodation.is_furnished %}Yes{% else %}No{% endif %}</p>
+                    <p class="card-text text-muted">Available From: {{ accommodation.available_from }}</p>
+                    <p class="card-text text-muted">Available To: {{ accommodation.available_to }}</p>
+                    <!-- Add more accommodation attributes here -->
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="text-primary">Reviews:</h3>
+                    <ul class="list-group" style="max-height: 400px; overflow-y: auto">
+                        {% for review in accommodation.review_set.all %}
+                        <li class="list-group-item">
+                            <p class="mb-1 text-info">Rating: {{ review.rating }}</p>
+                            <p class="mb-1">Comment: {{ review.comment }}</p>
+                            <!-- Add more review attributes here -->
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No accommodations found.</p>
+    {% endif %}
+</div>
+{% endblock %}

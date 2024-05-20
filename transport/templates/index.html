@@ -1,0 +1,81 @@
+<!-- index.html -->
+{% extends 'base.html' %} {% block content %}{% load static %} {% comment %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <!-- Timeline -->
+            <div class="timeline">
+                <!-- Iterate over posts -->
+                {% for post in posts %}
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h3>{{ post.title }}</h3>
+                        <p>{{ post.content }}</p>
+                        <small class="text-muted">{{ post.created_at }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endcomment %}
+<!-- home.html -->
+{% comment %}
+<div class="container">
+    <div
+        class="jumbotron"
+        style="background-color: #f5f5f5; padding: 60px; text-align: center; border-radius: 20px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1)"
+    >
+        <h1 style="font-size: 3.5rem; color: #333; margin-bottom: 30px; font-weight: bold">Welcome to StudentHelp</h1>
+        <p style="font-size: 1.6rem; color: #666; margin-bottom: 40px; line-height: 2">
+            Your go-to platform for student accommodations and transportation. Discover comfortable living spaces and convenient travel
+            options for your student journey.
+        </p>
+        <a
+            href="{% url 'logement' %}"
+            class="btn btn-primary btn-lg"
+            style="
+                font-size: 1.4rem;
+                padding: 20px 40px;
+                border-radius: 40px;
+                margin-right: 30px;
+                background-color: #4caf50;
+                border-color: #4caf50;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            "
+            >Find Accommodation</a
+        >
+        <a
+            href="{% url 'transport_selection' %}"
+            class="btn btn-secondary btn-lg"
+            style="
+                font-size: 1.4rem;
+                padding: 20px 40px;
+                border-radius: 40px;
+                background-color: #ffc107;
+                border-color: #ffc107;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            "
+            >Find Transport</a
+        >
+    </div>
+</div>
+{% endcomment %}
+<div class="jumbotron jumbotron-fluid bg-info text-white">
+    <div class="container text-center">
+        <h1 class="display-3 mb-4">Welcome to StudentHelp</h1>
+        <p class="lead mb-5">Your one-stop solution for student accommodations and transportation.</p>
+        <div class="row justify-content-center">
+            <div class="col-lg-4 col-md-6">
+                <a href="{% url 'logement' %}" class="btn btn-outline-light btn-lg btn-block mb-3 rounded-pill">Find Accommodation</a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a href="{% url 'transport_selection' %}" class="btn btn-outline-light btn-lg btn-block rounded-pill">Find Transport</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

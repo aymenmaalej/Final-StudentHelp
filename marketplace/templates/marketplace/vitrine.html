@@ -1,0 +1,26 @@
+{% comment %} {% extends 'base' %}
+{% load static %}
+{% block content %}
+<form method="POST" class="post-form">
+{% csrf_token %}
+
+<div class="container">
+<div style="overflow:scroll; border:#000000 1px solid;">
+<table>
+ <tr>
+{% for article in list %}
+<td>
+ <img src='../../media/{{ article.Img }}'class="rounded float-start" height="200px" width="200px"  alt="">
+ <figcaption class="figure-caption"> 
+    {{article.libelle}} 
+ </figcaption>
+    <p> {{article.description}} </p>
+    <p> {{article.prix}} DT. </p>
+</td>
+{% endfor %}
+ </tr>
+ </table>
+</div>
+</form> 
+</div>
+{% endblock %} {% endcomment %}

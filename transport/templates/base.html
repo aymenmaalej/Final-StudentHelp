@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+        <title>StudentHelp</title>
+        <style>
+            .post-activity {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 10px 0;
+                font-size: 14px;
+                font-weight: 500;
+            }
+            .post-activity div {
+                display: flex;
+                align-items: center;
+            }
+
+            .post-activity-link img {
+                width: 18px;
+                margin-right: 8px;
+            }
+
+            .post-activity-link:hover {
+                cursor: pointer;
+                opacity: 0.8;
+            }
+            .notification {
+                background: #fff;
+                padding: 15px;
+                border: 0px;
+                border-style: solid;
+                border-bottom-width: 1px;
+                border-image: linear-gradient(to right, white 0%, #cedae0 40%, #cedae0 60%, white 100%) 1 20%;
+            }
+
+            .notification.new {
+                animation: fadeInDown 500ms ease;
+            }
+
+            .notification-image-wrapper {
+                display: table-cell;
+                vertical-align: middle;
+            }
+
+            .notification-image {
+                display: inline-block;
+                height: 32px;
+                width: 32px;
+                overflow: hidden;
+                border-radius: 100%;
+            }
+            .dropdown-menu {
+                margin-left: 75%;
+                width: 300px;
+            }
+            .notification-text {
+                display: table-cell;
+                padding-left: 15px;
+                vertical-align: middle;
+                color: #747f8b;
+                cursor: pointer;
+                font-size: 14px;
+                word-spacing: 2px;
+                line-height: 21px;
+            }
+
+            .notification-text .highlight {
+                font-weight: bold;
+            }
+            .notification-icon {
+                position: relative;
+                display: inline-block;
+                margin-right: 10px; /* Adjust as needed for spacing */
+                margin-top: 5px; /* Adjust as needed for spacing */
+            }
+
+            .notification-icon .count {
+                position: absolute;
+                top: -8px;
+                right: -8px;
+                background-color: #ff4136; /* Adjust color as needed */
+                color: #fff;
+                font-size: 12px;
+                border-radius: 50%;
+                padding: 1px 6px;
+            }
+            .notification-buttons {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 10px;
+            }
+
+            .accept-button,
+            .deny-button {
+                padding: 5px 10px;
+                border: none;
+                border-radius: 3px;
+                cursor: pointer;
+            }
+
+            .accept-button {
+                background-color: #4caf50; /* Green */
+                color: white;
+            }
+
+            .deny-button {
+                background-color: #f44336; /* Red */
+                color: white;
+            }
+
+            .accept-button:hover,
+            .deny-button:hover {
+                opacity: 0.8;
+            }
+            @keyframes fadeInDown {
+                from {
+                    opacity: 0;
+                    transform: translate3d(0, -10%, 0);
+                }
+                to {
+                    opacity: 1;
+                    transform: none;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        {% load static %} {% include 'navbar.html' %} {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+        {% endfor %}
+
+        <!-- Your page content goes here -->
+        <div class="container cont" style="margin-top: 50px">{% block content %} {% endblock %}</div>
+
+        <!-- Bootstrap JavaScript -->
+
+        <script src="{% static 'static_jquery/js/jquery.js' %}"></script>
+        <script
+            src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"
+            integrity="sha384-pz3q9VEX8v4mOe6+z1rLGy5BpVSLjfw4+pS9N2lRVInPk9E3tOvjlG5G2hjuXHqI"
+            crossorigin="anonymous"
+        ></script>
+        <script>
+            // Updated script to handle friend request accept and deny buttons
+            $(document).ready(function () {
+                var awaitingNotifications = 0;
+                var newNotifications = [];
+
+                $(".notifications").on("click", function (event) {
+                    var notificationsCount = $("#notifications-count");
+                    var notificationDropdown = $("#notification-dropdown");
+                    var ddNotificationsCount = $("#dd-notifications-count");
+                    var notificationBody = $("#notification-body");
+
+                    if (awaitingNotifications > 0) {
+                        notificationsCount.text(awaitingNotifications);
+                        notificationsCount.css("display", "block");
+                    }
+
+                    if (notificationDropdown.hasClass("fadeInDown")) {
+                        hideDropdown(notificationDropdown);
+                    } else {
+                        fetchNotifications(notificationBody);
+                        notificationDropdown.css("display", "block");
+                        notificationDropdown.removeClass("fadeOutUp").addClass("fadeInDown");
+                        ddNotificationsCount.text(newNotifications.length);
+
+                        awaitingNotifications = 0;
+                        notificationsCount.css("display", "none");
+                    }
+                });
+
+                function hideDropdown(notificationDropdown) {
+                    notificationDropdown.removeClass("fadeInDown").addClass("fadeOutUp");
+                    setTimeout(function () {
+                        notificationDropdown.css("display", "none");
+                    }, 50);
+                }
+
+                function fetchNotifications(notificationBody) {
+                    $.ajax({
+                        url: "/fetch_notifications/",
+                        method: "GET",
+                        success: function (response) {
+                            newNotifications = response.notifications;
+                            renderNotifications(notificationBody);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Failed to fetch notifications:", error);
+                        },
+                    });
+                }
+
+                function renderNotifications(notificationBody) {
+                    notificationBody.empty();
+                    newNotifications.forEach(function (notification) {
+                        var notificationElement = $("<div>").addClass("notification new");
+                        var imageWrapper = $("<div>").addClass("notification-image-wrapper");
+                        var image = $("<div>").addClass("notification-image");
+                        if (notification.sender_photo) {
+                            image.html('<img src="' + notification.sender_photo + '" alt="" width="32">');
+                        } else {
+                            image.html('<img src="/path/to/placeholder_image.jpg" alt="" width="32">');
+                        }
+                        var text = $("<div>")
+                            .addClass("notification-text")
+                            .html('<span class="highlight">' + notification.sender + "</span> " + notification.message);
+                        var actions = $("<div>")
+                            .addClass("notification-actions")
+                            .html(notification.accept_button + notification.deny_button);
+
+                        imageWrapper.append(image);
+                        notificationElement.append(imageWrapper).append(text).append(actions);
+                        notificationBody.append(notificationElement);
+                    });
+
+                    $(".btn-accept-friend-request").on("click", function () {
+                        var senderEmail = $(this).data("sender-email");
+                        handleFriendRequest(senderEmail, "accept");
+                    });
+
+                    $(".btn-deny-friend-request").on("click", function () {
+                        var senderEmail = $(this).data("sender-email");
+                        handleFriendRequest(senderEmail, "deny");
+                    });
+                }
+
+                function handleFriendRequest(senderEmail, action) {
+                    var csrfToken = $("input[name='csrfmiddlewaretoken']").val();
+                    $.ajax({
+                        url: "/handle_friend_request/",
+                        method: "POST",
+                        data: {
+                            sender_email: senderEmail,
+                            action: action,
+                            csrfmiddlewaretoken: csrfToken,
+                        },
+                        success: function (response) {
+                            alert("Friend request " + action + "ed successfully!");
+                            fetchNotifications($("#notification-body"));
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Failed to " + action + " friend request:", error);
+                        },
+                    });
+                }
+            });
+        </script>
+        <script>
+            $(document).ready(function () {
+                const searchInput = $("#searchInput");
+                const searchResults = $(".search-results");
+
+                // Function to fetch search results
+                function fetchSearchResults(query) {
+                    $.ajax({
+                        url: `/userSearch/?q=${encodeURIComponent(query)}`,
+                        method: "GET",
+                        dataType: "json",
+                        success: function (data) {
+                            const resultsList = searchResults.find("ul");
+                            resultsList.empty();
+                            data.forEach((user) => {
+                                const li = $("<li>").addClass("search-result-item");
+                                const img = $("<img>").attr("src", user.img).addClass("search-result-image");
+                                const a = $("<a>").attr("href", "");
+                                const span = $("<span>").text(`${user.name} ${user.surname}`).addClass("search-result-name");
+                                li.append(img).append(span);
+                                li.on("click", function () {
+                                    window.location.href = `/profile/${user.email}/`;
+                                });
+                                resultsList.append(li);
+                            });
+                            searchResults.slideDown(); // Show the search results with animation
+                        },
+                        error: function (xhr, status, error) {
+                            console.error(error);
+                        },
+                    });
+                }
+
+                // Event listener for input change
+                searchInput.on("input", function () {
+                    const query = $(this).val().trim();
+                    if (query.length > 0) {
+                        fetchSearchResults(query);
+                    } else {
+                        searchResults.slideUp(); // Hide the search results if the query is empty
+                    }
+                });
+
+                // Ensure the search results dropdown matches the width of the search input
+                searchInput.on("focus", function () {
+                    searchResults.css("width", $(this).outerWidth() + "px");
+                });
+            });
+        </script>
+        <script>
+            $(document).ready(function () {
+                // Function to check if the user has liked a post
+                function checkLikeStatus(postId) {
+                    $.ajax({
+                        type: "GET",
+                        url: "/check_like/" + postId + "/",
+                        dataType: "json",
+                        success: function (response) {
+                            if (response.liked) {
+                                $(".like-button[data-post-id='" + postId + "'] img").attr("src", '{% static "images/like1.png" %}');
+                            }
+                        },
+                    });
+                }
+
+                // Event handler for like button click
+                $(".like-button").click(function () {
+                    var postId = $(this).data("post-id");
+                    var likeButton = $(this);
+                    $.ajax({
+                        type: "POST",
+                        url: "/like/" + postId + "/",
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                        },
+                        dataType: "json",
+                        success: function (response) {
+                            var likeCountSpan = likeButton.find(".like-count span");
+                            if (response.liked) {
+                                likeButton.find("img").attr("src", '{% static "images/like1.png" %}');
+                                likeCountSpan.text(parseInt(likeCountSpan.text()) + 1);
+                            } else {
+                                likeButton.find("img").attr("src", '{% static "images/like.png" %}');
+                                likeCountSpan.text(parseInt(likeCountSpan.text()) - 1);
+                            }
+                        },
+                    });
+                });
+
+                // Check like status for each post when the page loads
+                $(".like-button").each(function () {
+                    var postId = $(this).data("post-id");
+                    checkLikeStatus(postId);
+                });
+            });
+        </script>
+
+        {% comment %}
+        <script>
+            // Initialize Bootstrap dropdowns
+            $(document).ready(function () {
+                $(".dropdown-toggle").dropdown();
+            });
+        </script>
+        {% endcomment %}
+    </body>
+</html>

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %} Liste des fournisseur {% endblock title %}
+{% block content %}
+<!-- body -->
+<div class="container-fluid mt-3">
+    <div class="row">
+       <!-- all fournisseur -->
+        <div id='fournisseur' class="col-lg-9 mx-auto">
+            <div class="row mx-auto">
+               {% for frs in fournisseur %} 
+                    <div >
+                        <p ><b>{{frs.nom}}</b></p>
+                        <p >{{frs.adresse}}</p>
+                        <p >{{frs.email}}</p>
+                        <p >{{frs.telephone}}</p>
+                        
+                    </div>
+
+                 </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends 'magasin/baseMagasin.html' %} {% block title %}Catalogue de produits{% endblock title %} {% block content %}
+<style>
+    .side-navbar .nav-link {
+        color: #fff;
+        background: #141e30;
+        margin-bottom: 5px;
+        border-radius: 5px;
+        padding: 10px 15px;
+        transition: background 0.3s ease;
+    }
+
+    .side-navbar .nav-link.active,
+    .side-navbar .nav-link:hover {
+        background: #1e90ff;
+    }
+
+    .input-group .form-control {
+        border-radius: 20px 0 0 20px;
+    }
+
+    .input-group .btn-primary {
+        border-radius: 0 20px 20px 0;
+        background-color: #1e90ff;
+        border: none;
+    }
+
+    .card-custom {
+        background: linear-gradient(135deg, #243b55 0%, #141e30 100%);
+        border: none;
+        border-radius: 15px;
+        color: #fff;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-custom:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-custom .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .card-custom .card-text {
+        font-size: 1rem;
+        font-weight: 300;
+    }
+
+    .btn-custom {
+        background-color: #1e90ff;
+        border: none;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 50px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .btn-custom:hover {
+        background-color: #1c86ee;
+        color: #fff;
+    }
+
+    .form-group label {
+        color: #fff;
+    }
+</style>
+
+<div class="container-fluid mt-3">
+    <div class="row">
+        <div class="col-md-3">
+            <!-- Side Navbar -->
+            <ul class="nav flex-column side-navbar">
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'marketplace/main' %}">Accueil</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'cart' %}">Votre panier</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'add_product' %}">Ajouter un produit</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-9">
+            <!-- Product Search Form -->
+            <form class="mb-3" method="GET" action="{% url 'marketplace/main' %}" style="margin-top: 30px">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Rechercher des produits" name="q" value="{{ query }}" />
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">Rechercher</button>
+                    </div>
+                </div>
+            </form>
+            <!-- Product Cards -->
+            <div class="row">
+                {% if products %} {% for product in products %}
+                <div class="col-lg-4 mb-3">
+                    <div class="card card-custom h-100">
+                        <img
+                            src="../../media/{{ product.Img }}"
+                            class="card-img-top"
+                            style="object-fit: cover; height: 200px"
+                            alt="Image du produit"
+                        />
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.libelle }}</h5>
+                            <p class="card-text">{{ product.description }}</p>
+                            <p class="card-text">{{ product.prix }} DT</p>
+                            <form method="post" action="{% url 'add_to_cart' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ product.id }}" />
+                                <div class="form-group">
+                                    <label for="quantity">Quantité:</label>
+                                    <input type="number" id="quantity" name="quantity" value="1" min="1" class="form-control" />
+                                </div>
+                                <button type="submit" class="btn btn-custom">Ajouter au panier</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %} {% else %}
+                <div class="col">
+                    <p>Aucun produit trouvé.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="text-center mb-4">
+                <h2 class="display-4">Transport Options</h2>
+                <p class="lead">Choose whether you are looking for transport offers or requesting transport.</p>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card card-custom text-center">
+                        <div class="card-body">
+                            <div class="icon mb-3">
+                                <i class="fas fa-car-side fa-3x"></i>
+                            </div>
+                            <h5 class="card-title">Looking for Offers</h5>
+                            <p class="card-text">Click below if you are looking for transport offers.</p>
+                            <a href="{% url 'transport_offers' %}" class="btn btn-custom">I'm Looking for Offers</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card card-custom text-center">
+                        <div class="card-body">
+                            <div class="icon mb-3">
+                                <i class="fas fa-bus-alt fa-3x"></i>
+                            </div>
+                            <h5 class="card-title">Requesting Transport</h5>
+                            <p class="card-text">Click below if you are requesting transport.</p>
+                            <a href="{% url 'offer_transport' %}" class="btn btn-custom">I'm Looking for Passengers</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FontAwesome for icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<style>
+    .card-custom {
+        background: linear-gradient(135deg, #243b55 0%, #141e30 100%);
+        border: none;
+        border-radius: 15px;
+        color: #fff;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-custom:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-custom .icon {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        padding: 20px;
+        margin-bottom: 20px;
+        display: inline-block;
+    }
+
+    .card-custom .card-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .card-custom .card-text {
+        font-size: 1rem;
+        font-weight: 300;
+        margin-bottom: 20px;
+    }
+
+    .btn-custom {
+        background-color: #1e90ff;
+        border: none;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 50px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .btn-custom:hover {
+        background-color: #1c86ee;
+        color: #fff;
+    }
+</style>
+{% endblock %}

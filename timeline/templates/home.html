@@ -1,0 +1,564 @@
+{% extends 'base.html' %} {% block content %} {% load static %}
+<style>
+    /* CSS for the friend list */
+    .friend-list {
+        padding: 10px;
+        background-color: #f0f0f0;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .friend {
+        padding: 8px;
+        margin: 5px 0;
+        cursor: pointer;
+        background-color: #fff;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        transition: background-color 0.3s ease;
+    }
+
+    .friend:hover {
+        background-color: #e6e6e6;
+    }
+
+    .friend-photo {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .friend-name {
+        font-weight: bold;
+    }
+
+    /* CSS for the discussion view */
+    .discussion-view {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        width: 300px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #f5f5f5;
+        overflow: hidden;
+        z-index: 1000;
+    }
+
+    .discussion-header {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        background-color: #fff;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .discussion-photo {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    #current-friend {
+        flex-grow: 1;
+        font-weight: bold;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .close-discussion-btn {
+        background: none;
+        border: none;
+        color: #999;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .close-discussion-btn:hover {
+        color: #333;
+    }
+
+    .discussion-content {
+        padding: 10px;
+        max-height: 300px; /* Limit the height */
+        overflow-y: auto; /* Enable vertical scrolling */
+        background-color: #fafafa;
+    }
+
+    .message {
+        max-width: 70%;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 10px;
+        clear: both;
+    }
+
+    .sent {
+        background-color: #dcf8c6;
+        align-self: flex-end;
+    }
+
+    .received {
+        background-color: #fff;
+    }
+
+    .discussion-input {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #ddd;
+    }
+
+    .discussion-input input {
+        flex-grow: 1;
+        border: none;
+        border-radius: 20px;
+        padding: 10px;
+        margin-right: 10px;
+        font-size: 14px;
+    }
+
+    .discussion-input button {
+        background-color: #007bff;
+        border: none;
+        border-radius: 20px;
+        color: #fff;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .discussion-input button:hover {
+        background-color: #0056b3;
+    }
+
+    .main-content {
+        flex: 1;
+        margin-left: 20px;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .post {
+        margin-bottom: 20px;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .post-author {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .post-author img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .post-content {
+        margin-bottom: 10px;
+    }
+
+    .post-image {
+        max-width: 10px;
+        height: auto;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .post-activity {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .post-activity img {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+    }
+    .left-sidebar {
+        background-color: #f0f2f5; /* Set background color */
+        border-radius: 10px; /* Add border radius for rounded corners */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add box shadow for depth */
+        padding: 20px; /* Add padding for content */
+        margin-right: 20px; /* Add margin to create space between main content and right sidebar */
+    }
+
+    .sidebar-profile-box {
+        margin-bottom: 20px; /* Add margin for spacing */
+    }
+
+    .sidebar-profile-box img {
+        width: 100%; /* Ensure profile image fills container width */
+        border-radius: 10px; /* Add border radius for rounded corners */
+        margin-bottom: 10px; /* Add margin for spacing */
+    }
+
+    .sidebar-profile-info h1 {
+        margin-bottom: 5px; /* Add margin for spacing */
+    }
+
+    .sidebar-profile-info h3 {
+        color: #666; /* Set color for subheading */
+        margin-bottom: 10px; /* Add margin for spacing */
+    }
+
+    .sidebar-profile-link {
+        margin-top: 20px; /* Add margin for spacing */
+    }
+
+    .sidebar-profile-link a {
+        display: block; /* Make links block elements for spacing */
+        padding: 10px; /* Add padding for clickable area */
+        border-radius: 5px; /* Add border radius for rounded corners */
+        background-color: #fff; /* Set background color for links */
+        margin-bottom: 10px; /* Add margin for spacing */
+        text-decoration: none; /* Remove default underline */
+        color: #333; /* Set color for links */
+        transition: background-color 0.3s ease; /* Add transition for hover effect */
+    }
+
+    .sidebar-profile-link a:hover {
+        background-color: #e0e0e0; /* Change background color on hover */
+    }
+
+    .sidebar-activity {
+        margin-bottom: 20px; /* Add margin for spacing */
+    }
+
+    .sidebar-activity h3 {
+        margin-bottom: 10px; /* Add margin for spacing */
+        color: #666; /* Set color for heading */
+    }
+
+    .sidebar-activity a {
+        display: block; /* Make links block elements for spacing */
+        padding: 10px; /* Add padding for clickable area */
+        border-radius: 5px; /* Add border radius for rounded corners */
+        background-color: #fff; /* Set background color for links */
+        margin-bottom: 5px; /* Add margin for spacing */
+        text-decoration: none; /* Remove default underline */
+        color: #333; /* Set color for links */
+        transition: background-color 0.3s ease; /* Add transition for hover effect */
+    }
+
+    .sidebar-activity a:hover {
+        background-color: #e0e0e0; /* Change background color on hover */
+    }
+
+    #ShowMoreLink {
+        cursor: pointer; /* Set cursor to pointer */
+        color: #666; /* Set color for link */
+        margin-top: 10px; /* Add margin for spacing */
+    }
+
+    #ShowMoreLink:hover {
+        color: #333; /* Change color on hover */
+    }
+</style>
+
+<link rel="stylesheet" href="{% static 'css/home.css'%}" />
+<style></style>
+<div class="container">
+    <div class="left-sidebar">
+        <div class="sidebar-profile-box">
+            <img src="{% static 'images/cover-pic.png' %}" width="100%" />
+
+            <div class="sidebar-profile-info">
+                {% if user.is_authenticated %} {% if user.photo %}
+                <img src="{{ user.photo.url }}" />
+                {% else %}
+                <img src="{% static 'images/userImage.jpg' %}" />
+                {% endif %}
+                <h1>{{ user.name }}</h1>
+                <h3>Etudiant a ISET Sfax.</h3>
+                {% endif %}
+            </div>
+            <div class="sidebar-profile-link">
+                <a href="#"><img src="{% static 'images/items.png' %}" />My profile</a>
+                <a href="https://dashboard.ba9chich.com/" target="_blank"
+                    ><img src="{% static 'images/premium.png' %}" />Charity Donations</a
+                >
+            </div>
+        </div>
+
+        <div class="sidebar-activity" id="sidebarActivity">
+            <h3>RECENT</h3>
+            <a href="#"><img src="{% static 'images/recent.png' %}" />Web Developement</a>
+            <h3>GROUPS</h3>
+            <a href="#"><img src="{% static 'images/group.png' %}" />Web Design Group</a>
+            <h3>HASHTAG</h3>
+            <a href="#"><img src="{% static 'images/hashtag.png' %}" />webdevelopment</a>
+            <div class="discover-more-link">
+                <a href="#">Discover More</a>
+            </div>
+        </div>
+        <p id="ShowMoreLink" onclick="toggleActivity()">Show More <b>+</b></p>
+    </div>
+
+    <div class="main-content">
+        <!-- Main content here -->
+        {% if posts %} {% for post in posts %}
+        <div class="post">
+            <div class="post-author">
+                {% if post.user.photo %}
+                <img src="{{ post.user.photo.url }}" />
+                {% else %}
+                <img src="{% static 'images/userImage.jpg' %}" />
+                {% endif %}
+                <div>
+                    <h1>{{ post.user.name }} {{ post.user.surname }}</h1>
+                    <small>{{ post.created_at }}</small>
+                </div>
+            </div>
+            <p>{{ post.description }}</p>
+            <div class="post-stats">
+                {% if post.get_post_type == 'Accommodation' %}
+                <div>
+                    <span>Price: {{ post.price }}</span>
+                    <span>Bedrooms: {{ post.bedrooms }}</span>
+                    <span>Bathrooms: {{ post.bathrooms }}</span>
+                    <span>Furnished: {% if post.is_furnished %} Yes {% else %} No {% endif %}</span>
+                </div>
+                {% else %} {% if post.get_post_type == 'Transport' %}
+                <div>
+                    <span>Departure: {{ post.departure }}</span>
+                    <span>Destination: {{ post.destination }}</span>
+                    <span>Departure Time: {{ post.departure_time }}</span>
+                    <span>Seats Available: {{ post.seats_available }}</span>
+                </div>
+                {% endif %} {% endif %}
+            </div>
+            {% if post.image %}
+            <div style="text-align: center">
+                <img src="{{ post.image.url }}" width="50%" />
+            </div>
+
+            {% endif %}
+            <div class="post-activity">
+                <div>
+                    {% if post.user.photo %}
+                    <img src="{{ post.user.photo.url }}" class="posr-activity-user-icon" />
+                    {% else %}
+                    <img src="{% static 'images/userImage.jpg' %}" class="posr-activity-user-icon" />
+                    {% endif %}
+                    <img src="{% static 'images/down-arrow.png' %}" class="posr-activity-arrow-icon" />
+                </div>
+                <div class="post-activity-link like-button" data-post-id="{{ post.id }}">
+                    <img src="{% static 'images/like.png' %}" />
+                    <span class="like-count">Like <span>{{post.like_count}}</span></span>
+                </div>
+                <div class="post-activity-link">
+                    <img src="{% static 'images/comment.png' %}" />
+                    <span>Comment</span>
+                </div>
+                <div class="post-activity-link">
+                    <img src="{% static 'images/share.png' %}" />
+                    <span>Share</span>
+                </div>
+                <div class="post-activity-link">
+                    <img src="{% static 'images/send.png' %}" />
+                    <span>Send</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %} {% else %}
+        <p>No posts are available.</p>
+        {% endif %}
+    </div>
+
+    <div class="right-sidebar">
+        <!-- Friend list -->
+        <div class="friend-list">
+            <h3>Friend List</h3>
+            {% if friends %} {% for friend in friends %} {% if friend.email != user.email %}
+            <div
+                class="friend"
+                data-name="{{ friend.name }} {{ friend.surname }}"
+                data-email="{{ friend.email }}"
+                data-photo="{{ friend.photo.url }}"
+            >
+                <img src="{{ friend.photo.url }}" class="friend-photo" alt="{{ friend.name }}" />
+                <span class="friend-name">{{ friend.name }} {{ friend.surname }}</span>
+            </div>
+            {% endif %} {% endfor %} {% endif %}
+        </div>
+
+        <!-- Discussion view -->
+        <div class="discussion-view" style="display: none">
+            <div class="discussion-header">
+                <img id="discussion-photo" src="{% static 'images/userImage.jpg' %}" class="discussion-photo" />
+                <span id="current-friend">Friend's Name</span>
+                <button class="close-discussion-btn" id="closeButton">Close</button>
+            </div>
+            <div class="discussion-content"></div>
+            <div class="discussion-input">
+                <input type="text" id="message-input" placeholder="Type your message..." />
+                <button id="send-button">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentFriendEmail = "";
+
+    document.querySelectorAll(".friend").forEach((item) => {
+        item.addEventListener("click", (event) => {
+            const friendName = item.dataset.name;
+            const friendPhoto = item.dataset.photo;
+            const friendEmail = item.dataset.email; // Retrieve friend's email
+
+            // Update discussion header with friend name and photo
+            const currentFriend = document.getElementById("current-friend");
+            currentFriend.textContent = friendName;
+            currentFriendEmail = friendEmail; // Store friend's email in a variable
+            document.getElementById("discussion-photo").src = friendPhoto;
+
+            // Show discussion view
+            document.querySelector(".discussion-view").style.display = "block";
+
+            // Fetch messages for the selected friend
+            fetchMessages(friendEmail);
+        });
+    });
+
+    // JavaScript to handle close discussion button click event
+    document.querySelector(".close-discussion-btn").addEventListener("click", () => {
+        // Hide discussion view
+        const discussionView = document.querySelector(".discussion-view");
+        discussionView.style.display = "none";
+
+        // Reset the email variable and other UI elements
+        const currentFriend = document.getElementById("current-friend");
+        currentFriend.textContent = ""; // Reset friend name
+        currentFriendEmail = ""; // Reset friend email
+        document.getElementById("discussion-photo").src = ""; // Reset friend photo
+    });
+
+    // Function to fetch messages
+    function fetchMessages(email) {
+        const discussionView = document.querySelector(".discussion-view");
+        if (discussionView.style.display === "block") {
+            // Only fetch messages if discussion view is open
+            $.ajax({
+                url: "/fetch_messages/" + email + "/",
+                type: "GET",
+                success: function (data) {
+                    renderMessages(data.messages);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Failed to fetch messages:", error);
+                },
+            });
+        }
+    }
+
+    // Function to render messages
+    function renderMessages(messages) {
+        const discussionContent = document.querySelector(".discussion-content");
+        discussionContent.innerHTML = ""; // Clear previous messages
+
+        messages.forEach((message) => {
+            const messageElement = document.createElement("div");
+            messageElement.classList.add("message");
+
+            const messageContent = document.createElement("div");
+            messageContent.classList.add("message-content");
+            messageContent.textContent = message.content;
+
+            const messageSender = document.createElement("div");
+            messageSender.classList.add("message-sender");
+            messageSender.textContent = message.sender;
+
+            messageElement.appendChild(messageSender);
+            messageElement.appendChild(messageContent);
+
+            discussionContent.appendChild(messageElement);
+        });
+    }
+
+    // Function to send message
+    document.getElementById("send-button").addEventListener("click", () => {
+        sendMessage();
+    });
+
+    function sendMessage() {
+        const message = $("#message-input").val();
+        const recipientEmail = currentFriendEmail; // Use the variable storing the email
+        const csrfToken = $("input[name='csrfmiddlewaretoken']").val(); // Get CSRF token
+
+        if (message.trim() === "") {
+            alert("Please enter a message.");
+            return;
+        }
+
+        $.ajax({
+            url: "/send_message/",
+            type: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken,
+            },
+            data: {
+                recipient_email: recipientEmail,
+                content: message, // Send message content
+            },
+            success: function (response) {
+                // After sending message, fetch updated messages
+                fetchMessages(recipientEmail);
+                // Clear input field
+                $("#message-input").val("");
+            },
+            error: function (xhr, status, error) {
+                console.error("Failed to send message:", error); // Log error message
+            },
+        });
+    }
+
+    // Function to periodically check for new messages
+    setInterval(() => {
+        const recipientEmail = $("#current-friend").data("email");
+        const discussionView = document.querySelector(".discussion-view");
+        if (discussionView.style.display === "block" && recipientEmail) {
+            fetchMessages(recipientEmail);
+        }
+    }, 1000);
+    // Check for new messages every 5 seconds // Check for new messages every 5 seconds (adjust as needed)
+</script>
+
+<script>
+    let profileMenu = document.getElementById("profileMenu");
+    function toggleMenu() {
+        profileMenu.classList.toggle("open-menu");
+    }
+</script>
+
+<script>
+    let sideActivity = document.getElementById("sidebarActivity");
+    let moreLink = document.getElementById("showMoreLink");
+
+    function toggleActivity() {
+        sideActivity.classList.toggle("open-activity");
+
+        if (sideActivity.classList.contains("open-activity")) {
+            document.getElementById("ShowMoreLink").innerHTML = "Show Less <b>-</b>";
+        } else {
+            document.getElementById("ShowMoreLink").innerHTML = "Show More <b>+</b>";
+        }
+    }
+</script>
+
+{% endblock %}
